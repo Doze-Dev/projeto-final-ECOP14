@@ -1,12 +1,10 @@
-/*
- * File:   main.c
- * Author: felip
- *
- * Created on 17 de Novembro de 2021, 18:49
- */
+#include <proc/pic18f4520.h>
+#include "config.h"
+#include "delay.h"
+#include "lcd.h"
+#include "ds1307.h"
+#include "i2c.h"
 
-
-#include <xc.h>
 
 void main(void) {
     return;
