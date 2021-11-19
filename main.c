@@ -46,13 +46,17 @@ void crono(int t){
     }
     
     PORTD = 0x0A;
+    
+    lcdCommand(L_CLR);
+    lcdCommand(L_L1);
+    lcdString("PRONTO!");
 }
 
 void portempolivre(){
     unsigned int tecla = 16;
-    char tec = 0;
-    char min = 0;
-    int conv, tempo;
+    char tec1 = 0, tec2 = 0;
+    int min = 0, seg = 0;
+    int tempo, m, s;
     
     lcdCommand(L_CLR);
     lcdCommand(L_L1);
@@ -62,11 +66,12 @@ void portempolivre(){
     lcdCommand(L_L1);
     lcdString("Altere o Tempo");
     
-    serial_tx_str(" Altere o tempo usando as teclas:\r\n");
+    serial_tx_str(" Altere o tempo usando as teclas.\r\n");
+    serial_tx_str(" Use d3 e d5 para 1 min \r\n");
+    serial_tx_str(" Use d7 para finalizar:\r\n");
     
-    while(tec == 0){
+    while(tec1 == 0){
         kpDebounce();
-        
         
         if(kpRead() != tecla){
             tecla = kpRead();
@@ -82,25 +87,56 @@ void portempolivre(){
                 
             }
             if(bitTst(tecla,4)){
-                tec = 1;
-                serial_tx_str(" Tempo alterado\r\n");
+                tec1 = 1;
+                serial_tx_str(" Minutos alterados\r\n");
             }  
         }
-        
-        
-        
     }
     
-    conv = min - '0';
-    tempo = conv * 60;
+    
+    serial_tx_str(" Use d3 e d5 para 10 segundos \r\n");
+    serial_tx_str(" Use d7 para finalizar:\r\n");
+    
+    while(tec2 == 0){
+        kpDebounce();
+        
+        if(kpRead() != tecla){
+            tecla = kpRead();
+            if(bitTst(tecla,0)){
+                seg++;
+                serial_tx(seg);
+               
+                
+            }
+            if(bitTst(tecla,2)){
+                seg--;
+                serial_tx(seg);
+                
+            }
+            if(bitTst(tecla,4)){
+                tec2 = 1;
+                serial_tx_str(" Segundos alterados\r\n");
+            }  
+        }
+    }
+    
+    //conv = min - '0';
+    m = min * 60;
+    s = seg * 10;
+    tempo = m + s;
+    
+    lcdCommand(L_CLR);
+    lcdCommand(L_L1);
+    lcdString("Descongelando...");
     
     crono(tempo);
 }
 
-
 void porpeso(){
-    unsigned char peso;
-    int i;
+    unsigned int tecla = 16;
+    char tec = 0;
+    int peso = 0;
+    int tempo, p;
     
     lcdCommand(L_CLR);
     lcdCommand(L_L1);
@@ -108,50 +144,45 @@ void porpeso(){
     atraso_ms(200);
     lcdCommand(L_CLR);
     lcdCommand(L_L1);
-    lcdString("(1)100g  (2)300g");
-    lcdCommand(L_L2);
-    lcdString("(3)700g");
+    lcdString("Altere o Peso");
     
-    serial_tx_str(" Digite a opcao de peso:\r\n");
+    serial_tx_str(" Altere o peso usando as teclas.\r\n");
+    serial_tx_str(" Use d3 e d5 para 100 gramas \r\n");
+    serial_tx_str(" Use d7 para finalizar:\r\n");
     
-    for (i = 0; i < 2; i++) {
+    
+    while(tec == 0){
+        kpDebounce();
         
-        peso = serial_rx(2000);
-        serial_tx(peso);
-        
-        switch(peso){
-            case '1':
-                lcdCommand(L_CLR);
-                lcdCommand(L_L1);
-                lcdString("Descongelando");
-                lcdCommand(L_L2);
-                lcdString("100g");
-                crono(150);
-                //2:30
-                break;
-            case '2':
-                lcdCommand(L_CLR);
-                lcdCommand(L_L1);
-                lcdString("Descongelando");
-                lcdCommand(L_L2);
-                lcdString("300g");
-                crono(250);
-                //4:10
-                break;
-            case '3':
-                lcdCommand(L_CLR);
-                lcdCommand(L_L1);
-                lcdString("Descongelando");
-                lcdCommand(L_L2);
-                lcdString("700g");
-                crono(480);
-                //10:00
-                break;
-                        
+        if(kpRead() != tecla){
+            tecla = kpRead();
+            if(bitTst(tecla,0)){
+                peso++;
+                serial_tx(peso);
+               
+                
+            }
+            if(bitTst(tecla,2)){
+                peso--;
+                serial_tx(peso);
+                
+            }
+            if(bitTst(tecla,4)){
+                tec = 1;
+                serial_tx_str(" Minutos alterados\r\n");
+            }  
         }
-        
     }
     
+    
+    p = peso*100;
+    
+    tempo = (p*165)/100;
+    
+    lcdCommand(L_CLR);
+    lcdCommand(L_L1);
+    lcdString("Descongelando...");
+    crono(tempo);
 }
 
 void descongela(){
@@ -187,8 +218,6 @@ void descongela(){
         
     }
 }
-
-
 
 void main(void) {
     unsigned char i;
@@ -229,7 +258,7 @@ void main(void) {
             case '1':
                 lcdCommand(L_CLR);
                 lcdCommand(L_L1);
-                lcdString("MODO PIPOCA");
+                lcdString("Preparando...");
                 crono(140);
                 break;
             case '2':
