@@ -169,7 +169,7 @@ void porpeso(){
             }
             if(bitTst(tecla,4)){
                 tec = 1;
-                serial_tx_str(" Minutos alterados\r\n");
+                serial_tx_str(" Peso alterado\r\n");
             }  
         }
     }
@@ -256,6 +256,10 @@ void main(void) {
         
         switch(op){
             case '1':
+                lcdCommand(L_CLR);
+                lcdCommand(L_L1);
+                lcdString("MODO PIPOCA");
+                atraso_ms(200);
                 lcdCommand(L_CLR);
                 lcdCommand(L_L1);
                 lcdString("Preparando...");
